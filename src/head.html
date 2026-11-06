@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Estudio de Propuestas y Landings — EstrategIA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#EDF1F7;--card:#FBFCFE;--ink:#0A0E27;--mut:#5F6A85;--line:#D6DCEA;--acc:#00D9FF;--acc2:#FF00FF;--acci:color-mix(in srgb,var(--acc) 52%,var(--ink));--r:14px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 'DM Sans',system-ui,sans-serif}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:30;background:var(--ink);color:#EAF0FF;display:flex;align-items:center;gap:18px;padding:10px 20px;flex-wrap:wrap}
+.logo{font-family:'DM Serif Display',serif;font-size:1.35rem;letter-spacing:.01em}
+.logo i{font-style:normal;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.top{border-bottom:3px solid transparent;border-image:linear-gradient(90deg,var(--acc),var(--acc2)) 1}
+.tabs{display:flex;gap:6px}
+.tabs button{background:transparent;border:1px solid #3A4656;color:#CFC8BB;padding:.5em 1.1em;border-radius:99px;cursor:pointer}
+.tabs button.on{background:var(--acc);border-color:var(--acc);color:var(--ink);font-weight:700}
+.cli{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cli select{background:#27323F;border:1px solid #3A4656;color:#F4EFE6;border-radius:8px;padding:.4em .6em;max-width:210px}
+.mini{background:#27323F;border:1px solid #3A4656;color:#F4EFE6;border-radius:8px;padding:.4em .8em;cursor:pointer;font-size:.88rem}
+.mini:hover{border-color:var(--acc)}
+.mini.lt{color:var(--ink);background:#fff;border-color:var(--line)}
+main{max-width:1560px;margin:0 auto;padding:22px 20px 60px}
+.cols{display:grid;grid-template-columns:minmax(340px,440px) 1fr;gap:22px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.panel h2{font-family:'DM Serif Display',serif;font-weight:400;font-size:1.35rem;margin:0 0 4px}
+.panel h3{margin:22px 0 8px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--acci)}
+.hint{color:var(--mut);font-size:.84rem;margin:0 0 10px}
+label{display:block;font-size:.82rem;font-weight:700;margin:12px 0 4px}
+label small{font-weight:400;color:var(--mut)}
+input[type=text],input[type=number],input[type=tel],select,textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:.55em .75em}
+textarea{resize:vertical;min-height:70px}
+input:focus,select:focus,textarea:focus{outline:2px solid color-mix(in srgb,var(--acc) 55%,transparent);border-color:var(--acc)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{flex:1;min-width:max-content;background:#fff;border:1px solid var(--line);border-radius:10px;padding:.5em .8em;cursor:pointer}
+.seg button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chk{display:flex;gap:8px;align-items:center;margin:10px 0 0;font-weight:500}
+.chk input{width:auto}
+.btn{background:var(--acc);color:var(--ink);border:0;border-radius:10px;padding:.65em 1.2em;font-weight:700;cursor:pointer}
+.btn.alt{background:var(--ink);color:#fff}
+.btn.line{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.btn:hover{filter:brightness(1.07)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.out textarea{min-height:190px;background:#fff;line-height:1.55}
+/* filas de costos */
+.it{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.it .r1{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center}
+.it .xb{background:none;border:0;cursor:pointer;font-size:1.3rem;color:var(--mut);padding:0 6px}
+.it .xb:hover{color:var(--acc)}
+.it .sub{margin-top:8px}
+.it textarea{min-height:44px;margin-top:8px}
+.dim{opacity:.45}
+/* hoja de propuesta: una sola página A4 */
+.sheetwrap{overflow:auto;margin-top:10px;border-radius:6px;padding-bottom:6px}
+.sheet{width:210mm;height:297mm;background:#fff;color:#141a33;font-size:13px;line-height:1.45;position:relative;overflow:hidden;box-shadow:0 20px 40px -26px rgba(10,14,39,.65);outline:none;margin:0 auto;font-family:'DM Sans',system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet .pg{display:flex;flex-direction:column;height:100%}
+.sheet .hd,.sheet .ft{flex:none}
+.sheet .hd{background:var(--ink);color:#fff;padding:1.7em 2.4em 1.5em;position:relative}
+.sheet .hd::after{content:"";position:absolute;left:0;right:0;bottom:0;height:.3em;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.sheet .br{font-weight:800;font-size:1.9em;letter-spacing:.01em;line-height:1}
+.sheet .br i{font-style:normal;color:var(--acc)}
+.sheet .tag{font-size:.78em;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-top:.6em}
+.sheet .bd{padding:1.8em 2.4em 1.2em}
+.sheet h1{font-size:2.2em;line-height:1.05;margin:0 0 .4em;color:var(--ink);font-weight:800;letter-spacing:-.02em}
+.sheet .intro{color:#3F4766;margin:0 0 .6em}
+.sheet .two{display:grid;grid-template-columns:1.1fr .9fr;gap:1.8em}
+.sheet h4{margin:1.1em 0 .5em;font-size:.76em;letter-spacing:.18em;text-transform:uppercase;color:var(--acci);display:flex;align-items:center;gap:.6em}
+.sheet h4::before{content:"";width:.7em;height:.7em;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));flex:none}
+.sheet ul,.sheet ol{margin:0;padding-left:1.2em}.sheet li{margin:.3em 0}
+.sheet table{width:100%;border-collapse:collapse}
+.sheet td{padding:.55em 0;border-bottom:1px solid #E1E6F2;vertical-align:top}
+.sheet td:last-child{text-align:right;font-weight:700;padding-left:1.4em;max-width:46%;color:var(--ink)}
+.sheet td small{display:block;color:#5F6A85;font-weight:400;font-size:.9em}
+.sheet .nt{margin:.9em 0 0;color:#5F6A85;font-size:.92em}
+.sheet .ex{margin-top:1em;padding:.8em 1em;border-left:.3em solid var(--acc2);background:#F3F6FD;font-size:.92em;color:#3F4766}
+.sheet .cta{margin:1.2em 0 0}
+.sheet .cta a{display:inline-block;background:var(--ink);color:#fff;padding:.75em 1.4em;border-radius:99px;text-decoration:none;font-weight:700;box-shadow:inset 0 -.2em 0 var(--acc)}
+.sheet .ft{margin-top:auto;column-gap:1.4em;background:var(--ink);color:#C9D2F0;padding:1.1em 2.4em;display:flex;gap:.6em 1.8em;flex-wrap:wrap;font-size:.92em;align-items:center;position:relative}
+.sheet .ft::before{content:"";position:absolute;left:0;right:0;top:0;height:.25em;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.sheet .ft a{color:var(--acc);text-decoration:none;font-weight:700}
+/* galería de modelos */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+.chips button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:.35em .95em;font-size:.84rem;cursor:pointer}
+.chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.ths{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.th{cursor:pointer;border:2px solid transparent;border-radius:14px;padding:6px;background:#fff;transition:transform .2s,border-color .2s;min-width:0}
+.th:hover{transform:translateY(-3px)}
+.th.on{border-color:var(--acc)}
+.th .sc{position:relative;aspect-ratio:1280/820;overflow:hidden;border-radius:9px;background:#ddd}
+.th iframe{position:absolute;left:0;top:0;width:1280px;height:820px;border:0;transform-origin:0 0;pointer-events:none}
+.th b{display:block;margin:8px 4px 0}.th small{color:var(--mut);margin:0 4px 4px;display:block}
+.pv{display:flex;flex-direction:column;gap:10px;min-width:0}
+.frame{border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;justify-content:center;background:#D9D2C5}
+.frame iframe{border:0;background:#fff;width:100%;height:78vh;transition:width .25s}
+.frame.mob iframe{width:392px;margin:14px 0;border-radius:18px;box-shadow:0 0 0 8px #1B2430}
+.stat{font-size:.84rem;color:var(--acci);margin-top:8px;min-height:1.2em}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.thumbs img{height:46px;width:46px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+dialog{border:0;border-radius:14px;padding:20px;width:min(560px,94vw);box-shadow:0 30px 80px rgba(0,0,0,.4)}
+
+#segN{background:var(--acc2);color:#fff;border-radius:99px;padding:1px 7px;font-size:.75rem;margin-left:4px}
+#dlgSeg{width:min(900px,96vw)}
+.segrow{display:grid;grid-template-columns:1.2fr 1.3fr 1fr 1fr 1.2fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.segrow.due{background:color-mix(in srgb,var(--acc2) 9%,transparent);border-left:4px solid var(--acc2);padding-left:8px}
+.segrow b{display:block}.segrow small{color:var(--mut)}
+.segrow input,.segrow select{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:.86rem;background:#fff}
+.segf{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.segf button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font:inherit;font-size:.84rem;cursor:pointer}.segf button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+@media(max-width:800px){.segrow{grid-template-columns:1fr 1fr}}
+dialog::backdrop{background:rgba(20,25,35,.55)}
+@media(max-width:1000px){.cols{grid-template-columns:1fr}.ths{grid-template-columns:1fr}}
+@media print{
+ @page{size:A4;margin:0}
+ html,body{background:#fff!important;margin:0!important;padding:0!important}
+ body>*:not(#printRoot){display:none!important}
+ #printRoot{display:block!important}
+ #printRoot .sheet{box-shadow:none!important;margin:0!important}
+}
+#printRoot{display:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo">Estrateg<i>IA</i> · Estudio</div>
+  <div class="tabs">
+    <button data-tab="prop" class="on">1 · Propuesta</button>
+    <button data-tab="land">2 · Landing al instante</button>
+  </div>
+  <div class="cli">
+    <select id="cl" title="Clientes guardados"><option value="">— clientes guardados —</option></select>
+    <button class="mini" id="cSave">Guardar</button>
+    <button class="mini" id="cNew">Nuevo</button>
+    <button class="mini" id="cDel">Borrar</button>
+    <button class="mini" id="cImp">Importar datos</button>
+    <button class="mini" id="cSeg">Seguimiento <b id="segN" hidden></b></button>
+  </div>
+</header>
+
+<main>
+<!-- ================= PESTAÑA 1: PROPUESTA ================= -->
+<section id="tab-prop" class="tab">
+ <div class="cols">
+  <div class="panel form">
+    <h2>Datos de la tienda</h2>
+    <p class="hint">Lo que cargues acá lo toma también la landing: nombre, rubro, texto corto, Instagram y WhatsApp.</p>
+    <div class="row2">
+      <div><label>Nombre del negocio</label><input type="text" data-k="negocio" placeholder="Ej: Boutique Aurora"></div>
+      <div><label>Con quién hablás</label><input type="text" data-k="contacto" placeholder="Ej: Lucía"></div>
+    </div>
+    <div class="row2">
+      <div><label>Rubro</label><select data-k="rubro" class="rubroSel"></select></div>
+      <div><label>Instagram del negocio</label><input type="text" data-k="igCliente" placeholder="@boutiqueaurora"></div>
+    </div>
+    <label>De qué se trata el negocio <small>(1 o 2 líneas; aparece en la portada de la landing)</small></label>
+    <textarea data-k="resumen" style="min-height:62px" placeholder="Ej: Ropa de mujer en lino y algodón, hecha en pequeñas tiradas en Buenos Aires"></textarea>
+    <div class="row2">
+      <div><label>WhatsApp del negocio <small>(opcional)</small></label><input type="text" data-k="wa" placeholder="11 5555-1234"></div>
+      <div><label>Ciudad <small>(opcional)</small></label><input type="text" data-k="ciudad"></div>
+    </div>
+    <label>Algo concreto que viste de su tienda <small>(hace único el mensaje)</small></label>
+    <textarea data-k="obs" style="min-height:62px" placeholder="Ej: me encantaron sus vestidos de lino, pero vi que los pedidos van todos por mensaje directo"></textarea>
+
+    <h3>Qué le ofrezco</h3>
+    <div class="seg" data-k="oferta">
+      <button data-v="landing">Landing page</button>
+      <button data-v="app">Micro app (pedidos)</button>
+      <button data-v="ambas">Las dos opciones</button>
+    </div>
+    <label class="chk"><input type="checkbox" data-k="demo"> Ofrezco demo gratis con sus fotos/productos</label>
+    <label class="chk"><input type="checkbox" data-k="panel"> Incluye panel admin para que cambie sus productos</label>
+    <label>Qué incluye <small>(una por línea; vacío = lista automática)</small></label>
+    <textarea data-k="incluye" style="min-height:64px"></textarea>
+    <label>Cómo trabajamos <small>(una por línea; vacío = pasos automáticos)</small></label>
+    <textarea data-k="pasos" style="min-height:64px"></textarea>
+
+    <h3>Precio principal</h3>
+    <label>Cómo mostrar el precio</label>
+    <div class="seg" data-k="moneda">
+      <button data-v="ambas">USD y pesos</button>
+      <button data-v="usd">Solo USD</button>
+      <button data-v="ars">Solo pesos</button>
+    </div>
+    <div class="row2" id="pLand">
+      <div><label>Landing (USD)</label><input type="text" data-k="precioUSD"></div>
+      <div><label>Landing ($ ARS)</label><input type="text" data-k="precioARS"></div>
+    </div>
+    <div class="row2" id="pApp">
+      <div><label>Micro app (USD)</label><input type="text" data-k="appUSD" placeholder="vacío = a convenir"></div>
+      <div><label>Micro app ($ ARS)</label><input type="text" data-k="appARS" placeholder="vacío = a convenir"></div>
+    </div>
+    <label>Detalle del pago <small>(vacío = “Pago único, incluye diseño y publicación”)</small></label>
+    <textarea data-k="detallePago" style="min-height:46px" placeholder="Ej: 50% para empezar y 50% al entregar"></textarea>
+
+    <h3>Otros costos y beneficios</h3>
+    <p class="hint">Cada fila es libre: dominio gratis, mantenimiento 3 meses gratis y después un monto, o escribís el detalle como quieras.</p>
+    <div id="items"></div>
+    <div class="bar">
+      <button class="mini lt" data-add="gratis">+ Algo gratis</button>
+      <button class="mini lt" data-add="unico">+ Pago único</button>
+      <button class="mini lt" data-add="mensual">+ Pago mensual</button>
+      <button class="mini lt" data-add="gratis_luego">+ Gratis y luego mensual</button>
+      <button class="mini lt" data-add="texto">+ Texto libre</button>
+    </div>
+    <label>Notas al pie <small>(una por línea)</small></label>
+    <textarea data-k="notas" style="min-height:74px"></textarea>
+
+    <h3>Tus datos (firma)</h3>
+    <div class="row2">
+      <div><label>Tu nombre</label><input type="text" data-k="tuNombre"></div>
+      <div><label>Tu marca</label><input type="text" data-k="marca"></div>
+    </div>
+    <div class="row2">
+      <div><label>Tu WhatsApp</label><input type="text" data-k="miWa"></div>
+      <div><label>Tu Instagram</label><input type="text" data-k="miIg"></div>
+    </div>
+    <label>Link a tus proyectos <small>(idealmente directo a las landings)</small></label><input type="text" data-k="portafolio">
+    <label>Aclaración sobre los ejemplos <small>(sale en la hoja; vacío = no aparece)</small></label>
+    <textarea data-k="avisoEjemplo" style="min-height:54px"></textarea>
+    <label>Colores de mi marca <small>(se aplican a la herramienta y a la hoja)</small></label>
+    <div class="row3"><div><small>Fondo oscuro</small><input type="color" data-k="bDark" style="width:100%;height:38px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#fff"></div><div><small>Principal</small><input type="color" data-k="bMain" style="width:100%;height:38px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#fff"></div><div><small>Secundario</small><input type="color" data-k="bAcc" style="width:100%;height:38px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#fff"></div></div>
+  </div>
+
+  <div class="panel out">
+    <h2>Mensaje para mandar por Instagram</h2>
+    <p class="hint">Corto, para el primer mensaje directo. Lo que edites acá (y en la hoja) se guarda tal cual con “Guardar”. Si después cambiás un dato de la izquierda que afecta al texto, se vuelve a generar.</p>
+    <textarea id="dm" style="min-height:230px"></textarea>
+    <div class="bar tools">
+      <button class="btn" id="cpDM">Copiar mensaje</button>
+      <button class="btn line" id="longMsg">Ver versión larga (WhatsApp)</button>
+      <button class="btn line" id="regen">Regenerar texto</button>
+    </div>
+    <h2 style="margin-top:26px">Propuesta completa</h2>
+    <p class="hint">Una sola hoja A4, lista para mandar. Hacé clic y corregí cualquier frase directamente en la hoja; si el texto crece, se achica solo para que entre.</p>
+    <div class="bar tools">
+      <button class="btn alt" id="prt">Descargar PDF</button>
+      <button class="btn line" id="cpTxt">Copiar como texto</button>
+      <button class="btn line" id="toLand">Armar su landing →</button>
+    </div>
+    <p class="hint" id="fitInfo"></p>
+    <p class="hint" id="pdfHint" hidden>Se abre la ventana de impresión: en “Destino” elegí <b>Guardar como PDF</b>. El PDF sale en una sola hoja y los links (tu página, WhatsApp e Instagram) quedan clickeables.</p>
+    <div class="sheetwrap"><div class="sheet" id="sheet" contenteditable="true" spellcheck="true"></div></div>
+  </div>
+ </div>
+ <div class="panel gp" style="margin-top:22px">
+   <h2>Modelos de landing para mostrarle</h2>
+   <p class="hint">Ya con su nombre y su texto. Son solo imágenes de representación y ejemplo. Elegí una categoría y tocá un modelo para abrirlo y editarlo.</p>
+   <div id="galP"></div>
+ </div>
+</section>
+
+<!-- ================= PESTAÑA 2: LANDING ================= -->
+<section id="tab-land" class="tab" hidden>
+ <div class="cols">
+  <div class="panel form">
+    <h2>Contame el negocio</h2>
+    <p class="hint">Escribí o pegá lo que te cuenta el dueño, con tus palabras. Después tocá “Interpretar”.</p>
+    <textarea data-k="desc" style="min-height:130px" placeholder="Ej: Se llama Boutique Aurora, vende ropa de mujer, vestidos y remeras de lino. Queda en Av. Corrientes 1234, Buenos Aires. Abren de lunes a viernes de 10 a 19 y sábados de 10 a 14. WhatsApp 11 5555-1234, Instagram @boutiqueaurora"></textarea>
+    <div class="bar">
+      <button class="btn" id="interp">Interpretar</button>
+      <button class="btn line" id="fillAll" title="Pisa los textos con los del rubro">Reemplazar textos del rubro</button>
+    </div>
+    <div class="stat" id="stat"></div>
+    <p class="hint">Lee palabras clave (no es IA). Si querés textos más trabajados, contame el negocio por el chat y te paso un bloque para pegar en <b>Importar datos</b>.</p>
+
+    <h3>Datos</h3>
+    <div class="row2">
+      <div><label>Nombre</label><input type="text" data-k="negocio"></div>
+      <div><label>Rubro</label><select data-k="rubro" class="rubroSel"></select></div>
+    </div>
+    <label>Texto corto de portada</label><textarea data-k="resumen" style="min-height:54px"></textarea>
+    <label>Frase principal</label><input type="text" data-k="slogan" placeholder="Vacío = frase del rubro">
+    <label>Frase en inglés <small>(opcional)</small></label><input type="text" data-k="sloganEn">
+    <label>Sobre el negocio</label><textarea data-k="about" placeholder="Vacío = texto del rubro"></textarea>
+    <label>Sobre el negocio en inglés <small>(opcional)</small></label><textarea data-k="aboutEn" style="min-height:54px"></textarea>
+    <label>Productos o servicios <small>(uno por línea: nombre | precio | detalle)</small></label>
+    <textarea data-k="prods" style="min-height:120px"></textarea>
+    <p class="hint">Los productos que aparecen al elegir un rubro son de <b>ejemplo</b>, con precios inventados. Cambialos por los reales antes de mostrar nada.</p>
+    <label>Por qué elegirlos <small>(una por línea)</small></label>
+    <textarea data-k="difs" style="min-height:80px"></textarea>
+
+    <h3>Contacto y ubicación</h3>
+    <div class="row2">
+      <div><label>WhatsApp del negocio</label><input type="text" data-k="wa" placeholder="11 5555-1234"></div>
+      <div><label>Instagram</label><input type="text" data-k="igCliente" placeholder="@usuario"></div>
+    </div>
+    <div class="row2">
+      <div><label>Dirección</label><input type="text" data-k="direccion"></div>
+      <div><label>Ciudad</label><input type="text" data-k="ciudad"></div>
+    </div>
+    <label>Horarios <small>(uno por línea)</small></label>
+    <textarea data-k="horarios" style="min-height:64px" placeholder="Lunes a viernes: 10 a 19 hs&#10;Sábados: 10 a 14 hs"></textarea>
+
+    <h3>Estilo</h3>
+    <div class="row2">
+      <div><label>Color de acento</label>
+        <div style="display:flex;gap:6px;align-items:center"><input type="color" id="colorIn" style="width:54px;height:38px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#fff"><button class="mini lt" id="colorReset">Del modelo</button></div></div>
+      <div><label>Idioma</label>
+        <select data-k="lang"><option value="es">Español</option><option value="en">English</option><option value="both">ES + EN (con botón)</option></select></div>
+    </div>
+    <label>Qué hace la página</label>
+    <div class="seg" data-k="modo">
+      <button data-v="landing">Landing informativa</button>
+      <button data-v="pedido">Landing + pedido por WhatsApp</button>
+    </div>
+    <label>Foto principal</label><input type="file" id="heroFile" accept="image/*">
+    <div class="thumbs" id="heroTh"></div>
+    <label>Galería <small>(hasta 8 fotos; las primeras se usan en los productos)</small></label><input type="file" id="galFile" accept="image/*" multiple>
+    <div class="thumbs" id="galTh"></div>
+    <div class="bar"><button class="mini lt" id="clrImg">Quitar fotos</button></div>
+    <label class="chk"><input type="checkbox" data-k="cartel"> Mostrar cartel “Página demo para …”</label>
+    <label class="chk"><input type="checkbox" data-k="creditos"> Mostrar “Diseño web por mi marca” en el pie</label>
+  </div>
+
+  <div class="panel pv">
+    <h2>Modelos <small style="font-family:'DM Sans';font-size:.85rem;color:var(--mut)">— 3 por categoría, tocá para cambiar</small></h2>
+    <div id="galL"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <h2 style="margin-right:auto">Vista previa en vivo</h2>
+      <div class="seg" id="dev" style="flex:none"><button data-d="pc" class="on">PC</button><button data-d="mob">Celular</button></div>
+      <button class="btn" id="dlLand">Descargar HTML</button>
+      <button class="btn line" id="cpLand">Copiar código</button>
+    </div>
+    <div class="frame" id="frame"><iframe id="lp" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" title="Vista previa"></iframe></div>
+  </div>
+ </div>
+</section>
+</main>
+
+<dialog id="dlgSeg">
+  <h2 style="margin:0 0 4px;font-size:1.2rem">Seguimiento de propuestas</h2>
+  <p class="hint">Marcá en qué quedó cada cliente. Si no respondió o dijo que no, se agenda escribirle de nuevo a los 3 meses (podés cambiar la fecha).</p>
+  <div class="segf" id="segF"></div>
+  <div id="segL"></div>
+  <div class="bar" style="margin-top:14px"><button class="btn line" id="segX">Cerrar</button></div>
+</dialog>
+<dialog id="dlgImp">
+  <h2 style="font-family:'DM Serif Display',serif;font-weight:400;margin:0 0 6px">Importar datos</h2>
+  <p class="hint">Pegá acá el bloque de datos del negocio (formato JSON). Se completan los campos que traiga y los demás quedan como están.</p>
+  <textarea id="impTxt" style="min-height:180px;font-family:ui-monospace,monospace;font-size:.82rem"></textarea>
+  <div class="bar"><button class="btn" id="impOk">Importar</button><button class="btn line" id="impExp">Exportar los datos actuales</button><button class="btn line" id="impX">Cerrar</button></div>
+  <div class="stat" id="impSt"></div>
+</dialog>
+<dialog id="dlgLong">
+  <h2 style="font-family:'DM Serif Display',serif;font-weight:400;margin:0 0 6px">Versión larga</h2>
+  <textarea id="longTxt" style="min-height:300px"></textarea>
+  <div class="bar"><button class="btn" id="cpLong">Copiar</button><button class="btn line" id="longX">Cerrar</button></div>
+</dialog>
+<script>
