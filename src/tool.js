@@ -25,7 +25,8 @@ function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function stripImg(o){const c=clone(o);c.heroImg='';c.gal=[];return c}
 function save(){const j=JSON.stringify(S);if(!lsSet(KEY,j))lsSet(KEY,JSON.stringify(stripImg(S)))}
-function applyBrand(){const r=document.documentElement.style;r.setProperty('--ink',S.bDark||'#0A0E27');r.setProperty('--acc',S.bMain||'#00D9FF');r.setProperty('--acc2',S.bAcc||'#FF00FF')}
+function mixHex(a,b,p){const g=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16));const A=g(a),B=g(b);return '#'+A.map((v,i)=>Math.round(v*p+B[i]*(1-p)).toString(16).padStart(2,'0')).join('')}
+function applyBrand(){const r=document.documentElement.style;r.setProperty('--acci',mixHex(S.bMain||'#00D9FF',S.bDark||'#0A0E27',.52));r.setProperty('--ink',S.bDark||'#0A0E27');r.setProperty('--acc',S.bMain||'#00D9FF');r.setProperty('--acc2',S.bAcc||'#FF00FF')}
 function fix(){if(S.tuNombre==='Dio')S.tuNombre=DEF.tuNombre;if(/portafolio\.estrategia\.site/.test(S.portafolio||''))S.portafolio=DEF.portafolio;['bDark','bMain','bAcc'].forEach(k=>{if(!/^#[0-9a-f]{6}$/i.test(S[k]||''))S[k]=DEF[k]});if(!Array.isArray(S.items))S.items=clone(DEF.items);if(!S.auto||typeof S.auto!=='object')S.auto={};if(!RUBROS[S.rubro])S.rubro='otro';if(!DESIGN_BY_ID[S.diseno])S.diseno=S.rubro+'-1';if(!Array.isArray(S.gal))S.gal=[]}
 (function load(){const j=lsGet(KEY);if(j){try{Object.assign(S,JSON.parse(j))}catch(e){}}fix()})();
 
@@ -148,7 +149,8 @@ const SH={
 };
 function sheetHTML(){
  const m=model(),L=links();
- const incBlock=m.inc.length===1?`<h4>${esc(m.inc[0][0])}</h4><ul class="c2">${m.inc[0][1].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`
+ const half=Math.ceil(m.inc[0][1].length/2);
+ const incBlock=m.inc.length===1?`<h4>${esc(m.inc[0][0])}</h4><div class="incg"><ul>${m.inc[0][1].slice(0,half).map(x=>`<li>${esc(x)}</li>`).join('')}</ul><ul>${m.inc[0][1].slice(half).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`
   :`<div class="incg">${m.inc.map(([t,l])=>`<div><h4>${esc(t)}</h4><ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}</div>`;
  const aviso=(S.avisoEjemplo||'').trim();
  const brand=esc(S.marca||'Mi marca').replace(/(IA)$/,'<i>$1</i>');
@@ -294,6 +296,27 @@ function printSheet(){const h=$('#pdfHint');h.hidden=false;_title=document.title
 function mkPrint(){fitSheet();let r=$('#printRoot');if(r)r.remove();r=document.createElement('div');r.id='printRoot';const c=$('#sheet').cloneNode(true);c.removeAttribute('contenteditable');c.removeAttribute('id');r.appendChild(c);hydrate(c);document.body.appendChild(r)}
 window.addEventListener('beforeprint',mkPrint);window.addEventListener('afterprint',()=>{document.title=_title;const r=$('#printRoot');if(r)r.remove()});
 $('#prt').onclick=printSheet;
+function dlBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+async function exportImgs(){
+ const btn=$('#imgDl'),o=btn.textContent;btn.disabled=true;btn.textContent='Generando…';
+ try{
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+  fitSheet();
+  const stage=document.createElement('div');stage.style.cssText='position:fixed;left:-12000px;top:0;width:210mm;pointer-events:none';document.body.appendChild(stage);
+  const pgs=[...$('#sheet').querySelectorAll('.pg')];
+  for(let i=0;i<pgs.length;i++){
+   const w=document.createElement('div');w.className='sheet';w.style.cssText='width:210mm;margin:0;font-family:\'DM Sans\',system-ui,sans-serif';
+   const c=pgs[i].cloneNode(true);c.style.margin='0';c.style.boxShadow='none';w.appendChild(c);stage.appendChild(w);hydrate(w);
+   const cv=await html2canvas(c,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false});
+   const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',.92));
+   dlBlob('Propuesta-'+(slug(S.negocio)||'cliente')+'-hoja'+(i+1)+'.jpg',blob);
+   w.remove();await new Promise(r=>setTimeout(r,500));
+  }
+  stage.remove();btn.textContent='¡Listo!';
+ }catch(e){btn.textContent='No se pudo, probá de nuevo';console.error(e)}
+ setTimeout(()=>{btn.textContent=o;btn.disabled=false},1800);
+}
+$('#imgDl').onclick=exportImgs;
 $('#longMsg').onclick=()=>{$('#longTxt').value=longText();$('#dlgLong').showModal()};
 $('#cpLong').onclick=e=>copy($('#longTxt').value,e.target);
 $('#longX').onclick=()=>$('#dlgLong').close();

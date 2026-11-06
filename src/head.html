@@ -92,7 +92,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid color-mix(in srgb,var(
 .sheet .nt{margin:.9em 0 0;color:#5F6A85;font-size:.92em}
 .sheet .ex{margin-top:1em;padding:.8em 1em;border-left:.3em solid var(--acc2);background:#F3F6FD;font-size:.92em;color:#3F4766}
 .sheet .cta{margin:1.2em 0 0}
-.sheet .cta a{display:inline-block;background:var(--ink);color:#fff;padding:.75em 1.4em;border-radius:99px;text-decoration:none;font-weight:700;box-shadow:inset 0 -.2em 0 var(--acc)}
+.sheet .cta a{display:inline-block;background:var(--ink);color:#fff;padding:.75em 1.4em;border-radius:99px;text-decoration:none;font-weight:700;border:.15em solid var(--acc)}
 .sheet .ft{margin-top:auto;column-gap:1.4em;background:var(--ink);color:#C9D2F0;padding:1.1em 2.4em;display:flex;gap:.6em 1.8em;flex-wrap:wrap;font-size:.92em;align-items:center;position:relative}
 .sheet .ft::before{content:"";position:absolute;left:0;right:0;top:0;height:.25em;background:linear-gradient(90deg,var(--acc),var(--acc2))}
 .sheet .ft a{color:var(--acc);text-decoration:none;font-weight:700}
@@ -251,11 +251,12 @@ dialog::backdrop{background:rgba(20,25,35,.55)}
     <p class="hint">Dos hojas A4: la 1 explica qué es una landing y la 2 tiene la inversión. Hacé clic y corregí cualquier frase directamente en la hoja; si el texto crece, se achica solo para que entre.</p>
     <div class="bar tools">
       <button class="btn alt" id="prt">Descargar PDF</button>
+      <button class="btn alt" id="imgDl">Descargar imágenes (Instagram)</button>
       <button class="btn line" id="cpTxt">Copiar como texto</button>
       <button class="btn line" id="toLand">Armar su landing →</button>
     </div>
     <p class="hint" id="fitInfo"></p>
-    <p class="hint" id="pdfHint" hidden>Se abre la ventana de impresión: en “Destino” elegí <b>Guardar como PDF</b>. El PDF sale en 2 hojas y los links (tu página, WhatsApp e Instagram) quedan clickeables.</p>
+    <p class="hint" id="pdfHint" hidden>Se abre la ventana de impresión: en “Destino” elegí <b>Guardar como PDF</b>. Para mandar por Instagram usá “Descargar imágenes”: baja cada hoja como foto (JPG), porque Instagram no abre PDF. El PDF sale en 2 hojas y los links (tu página, WhatsApp e Instagram) quedan clickeables.</p>
     <div class="sheetwrap"><div class="sheet" id="sheet" contenteditable="true" spellcheck="true"></div></div>
   </div>
  </div>
