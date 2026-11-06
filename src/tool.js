@@ -141,7 +141,11 @@ function links(){
  const w=waNum(S.miWa),ig=igUser(S.miIg),p=fixUrl(S.portafolio);
  return{p,pTxt:showUrl(p),w:w?'https://wa.me/'+w:'',wTxt:S.miWa||'',ig:ig?'https://instagram.com/'+ig:'',igTxt:ig?'@'+ig:''};
 }
-const SHOTS=[['Botón directo a tu WhatsApp','Quien te ve te escribe en un toque'],['Tus productos con foto y precio','Todo tu catálogo ordenado y a la vista'],['Horarios, mapa e info importante','Dirección, horarios y cómo llegar']];
+const SH={
+ l:[['L0','Botón directo a tu WhatsApp','Quien te ve te escribe en un toque'],['L1','Tus productos con foto y precio','Todo tu catálogo ordenado y a la vista'],['L2','Horarios, mapa e info importante','Dirección, horarios y cómo llegar']],
+ a:[['A0','Catálogo para elegir','Productos con foto, precio y botón “Agregar”'],['A2','Tu cliente arma su pedido','El carrito suma solo y muestra el total'],['A1','Pedido listo por WhatsApp','Te llega con todo el detalle, sin comisiones']],
+ b:[['L0','Landing: botón directo a tu WhatsApp','Quien te ve te escribe en un toque'],['A0','Micro app: catálogo para elegir','Productos con foto, precio y botón “Agregar”'],['A1','Micro app: pedido listo por WhatsApp','Te llega con todo el detalle, sin comisiones']]
+};
 function sheetHTML(){
  const m=model(),L=links();
  const incBlock=m.inc.length===1?`<h4>${esc(m.inc[0][0])}</h4><ul class="c2">${m.inc[0][1].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`
@@ -149,11 +153,13 @@ function sheetHTML(){
  const aviso=(S.avisoEjemplo||'').trim();
  const brand=esc(S.marca||'Mi marca').replace(/(IA)$/,'<i>$1</i>');
  const ft=`<div class="ft"><span>${esc(S.tuNombre||'')}${S.marca?' · '+esc(S.marca):''}</span>${L.p?`<a href="${esc(L.p)}">${esc(L.pTxt)}</a>`:''}${L.w?`<a href="${esc(L.w)}">WhatsApp ${esc(L.wTxt)}</a>`:''}${L.ig?`<a href="${esc(L.ig)}">Instagram ${esc(L.igTxt)}</a>`:''}</div>`;
- const shots=SHOTS.map((s,i)=>`<figure><img alt="Ejemplo de landing" data-im="${i}" src=""><figcaption>${esc(s[0])}<small>${esc(s[1])}</small></figcaption></figure>`).join('');
+ const kind=S.oferta==='app'?'a':S.oferta==='landing'?'l':'b';
+ const shotTitle=kind==='a'?'Así se ve una micro app de pedidos':kind==='l'?'Así se ve una landing':'Así se ven las dos opciones';
+ const shots=SH[kind].map(s=>`<figure><img alt="Ejemplo" data-im="${s[0]}" src=""><figcaption>${esc(s[1])}<small>${esc(s[2])}</small></figcaption></figure>`).join('');
  return `<div class="pg p1"><div class="hd"><div class="br">${brand}</div><div class="tag">Propuesta personalizada</div></div>
  <div class="bd"><h1>Propuesta para ${esc(m.n)}</h1><p class="intro">${esc(m.intro)}</p>
  ${incBlock}
- <h4>Así se ve una landing</h4><div class="shots">${shots}</div>
+ <h4>${shotTitle}</h4><div class="shots">${shots}</div>
  <p class="nt">${aviso?esc(aviso):''}</p></div>${ft}</div>
  <div class="pg p2"><div class="hd slim"><div class="br">${brand}</div><div class="tag">Propuesta para ${esc(m.n)}</div></div>
  <div class="bd"><h4>Cómo trabajamos</h4><ol class="big">${m.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
@@ -163,7 +169,7 @@ function sheetHTML(){
  ${L.w?`<p class="cta"><a href="${esc(L.w)}">Escribime por WhatsApp</a></p>`:''}</div>${ft}</div>`;
 }
 const cleanSheet=h=>h.replace(/ src="data:[^"]*"/g,' src=""');
-function hydrate(root){const set=IMGS[S.rubro]||IMGS.otro;root.querySelectorAll('img[data-im]').forEach(im=>{im.src=set[+im.dataset.im]||''})}
+function hydrate(root){const r=S.rubro;root.querySelectorAll('img[data-im]').forEach(im=>{const k=im.dataset.im,set=k[0]==='A'?(IMGS_APP[r]||IMGS_APP.otro):(IMGS[r]||IMGS.otro);im.src=set[+k.slice(1)]||''})}
 function sheetText(){
  const m=model(),L=links();let t=`PROPUESTA PARA ${m.n.toUpperCase()}\n\n${m.intro}\n`;
  m.inc.forEach(([h,l])=>{t+=`\n${h.toUpperCase()}\n`+l.map(x=>'• '+x).join('\n')+'\n'});
