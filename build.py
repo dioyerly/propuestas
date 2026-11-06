@@ -1,4 +1,4 @@
-# Une src/head.html + src/engine.js + src/tool.js en index.html
+# Une src/head.html + engine.js + imgs.js + tool.js en index.html
 d='src/'
-out=open(d+'head.html',encoding='utf-8').read()+open(d+'engine.js',encoding='utf-8').read()+"\n"+open(d+'tool.js',encoding='utf-8').read()+"\n</script></body></html>"
-open('index.html','w',encoding='utf-8').write(out)
+r=lambda f:open(d+f,encoding='utf-8').read()
+open('index.html','w',encoding='utf-8').write(r('head.html')+r('engine.js')+"\n"+r('imgs.js')+"\n"+r('tool.js')+"\n</script></body></html>")

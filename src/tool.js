@@ -14,7 +14,7 @@ const DEF={
   {label:'Mantenimiento',mode:'gratis_luego',ars:'30000',usd:'',months:'3',text:'',detail:'Revisión mensual para ajustes. Pasados los meses gratis es opcional.'}
  ],
  notas:'El dominio se registra a tu nombre.\nSi más adelante no querés seguir con el mantenimiento, te quedás con los archivos de tu página y con tu dominio.',
- tuNombre:'Dio',marca:'EstrategIA',miWa:'+54 9 11 2642-5994',miIg:'@estrategia.datos',portafolio:'https://descargar.estrategia.site/#landings',bDark:'#0A0E27',bMain:'#00D9FF',bAcc:'#FF00FF',
+ tuNombre:'Dio Rodriguez',marca:'EstrategIA',miWa:'+54 9 11 2642-5994',miIg:'@estrategia.datos',portafolio:'https://descargar.estrategia.site/#landings',bDark:'#0A0E27',bMain:'#00D9FF',bAcc:'#FF00FF',
  avisoEjemplo:'Las landings de prueba que ves en mi página son solo imágenes de representación y ejemplo. La tuya se arma con tu propio contenido, tus fotos y tus colores.',estado:'nuevo',fEnvio:'',fReescribir:'',nota:'',dmSaved:'',dmGen:'',sheetSaved:'',sheetGen:'',
  desc:'',slogan:'',sloganEn:'',about:'',aboutEn:'',prods:'',difs:'',wa:'',direccion:'',ciudad:'',horarios:'',
  diseno:'otro-1',color:'',lang:'es',modo:'landing',cartel:true,creditos:true,heroImg:'',gal:[],auto:{}
@@ -26,7 +26,7 @@ function lsSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){return fa
 function stripImg(o){const c=clone(o);c.heroImg='';c.gal=[];return c}
 function save(){const j=JSON.stringify(S);if(!lsSet(KEY,j))lsSet(KEY,JSON.stringify(stripImg(S)))}
 function applyBrand(){const r=document.documentElement.style;r.setProperty('--ink',S.bDark||'#0A0E27');r.setProperty('--acc',S.bMain||'#00D9FF');r.setProperty('--acc2',S.bAcc||'#FF00FF')}
-function fix(){if(/portafolio\.estrategia\.site/.test(S.portafolio||''))S.portafolio=DEF.portafolio;['bDark','bMain','bAcc'].forEach(k=>{if(!/^#[0-9a-f]{6}$/i.test(S[k]||''))S[k]=DEF[k]});if(!Array.isArray(S.items))S.items=clone(DEF.items);if(!S.auto||typeof S.auto!=='object')S.auto={};if(!RUBROS[S.rubro])S.rubro='otro';if(!DESIGN_BY_ID[S.diseno])S.diseno=S.rubro+'-1';if(!Array.isArray(S.gal))S.gal=[]}
+function fix(){if(S.tuNombre==='Dio')S.tuNombre=DEF.tuNombre;if(/portafolio\.estrategia\.site/.test(S.portafolio||''))S.portafolio=DEF.portafolio;['bDark','bMain','bAcc'].forEach(k=>{if(!/^#[0-9a-f]{6}$/i.test(S[k]||''))S[k]=DEF[k]});if(!Array.isArray(S.items))S.items=clone(DEF.items);if(!S.auto||typeof S.auto!=='object')S.auto={};if(!RUBROS[S.rubro])S.rubro='otro';if(!DESIGN_BY_ID[S.diseno])S.diseno=S.rubro+'-1';if(!Array.isArray(S.gal))S.gal=[]}
 (function load(){const j=lsGet(KEY);if(j){try{Object.assign(S,JSON.parse(j))}catch(e){}}fix()})();
 
 /* ---------- textos automáticos del rubro ---------- */
@@ -141,19 +141,29 @@ function links(){
  const w=waNum(S.miWa),ig=igUser(S.miIg),p=fixUrl(S.portafolio);
  return{p,pTxt:showUrl(p),w:w?'https://wa.me/'+w:'',wTxt:S.miWa||'',ig:ig?'https://instagram.com/'+ig:'',igTxt:ig?'@'+ig:''};
 }
+const SHOTS=[['Botón directo a tu WhatsApp','Quien te ve te escribe en un toque'],['Tus productos con foto y precio','Todo tu catálogo ordenado y a la vista'],['Horarios, mapa e info importante','Dirección, horarios y cómo llegar']];
 function sheetHTML(){
  const m=model(),L=links();
- const inc=m.inc.map(([t,l])=>`<h4>${esc(t)}</h4><ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`).join('');
+ const incBlock=m.inc.length===1?`<h4>${esc(m.inc[0][0])}</h4><ul class="c2">${m.inc[0][1].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`
+  :`<div class="incg">${m.inc.map(([t,l])=>`<div><h4>${esc(t)}</h4><ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}</div>`;
  const aviso=(S.avisoEjemplo||'').trim();
- return `<div class="pg"><div class="hd"><div class="br">${esc(S.marca||'Mi marca').replace(/(IA)$/,'<i>$1</i>')}</div><div class="tag">Propuesta personalizada</div></div>
+ const brand=esc(S.marca||'Mi marca').replace(/(IA)$/,'<i>$1</i>');
+ const ft=`<div class="ft"><span>${esc(S.tuNombre||'')}${S.marca?' · '+esc(S.marca):''}</span>${L.p?`<a href="${esc(L.p)}">${esc(L.pTxt)}</a>`:''}${L.w?`<a href="${esc(L.w)}">WhatsApp ${esc(L.wTxt)}</a>`:''}${L.ig?`<a href="${esc(L.ig)}">Instagram ${esc(L.igTxt)}</a>`:''}</div>`;
+ const shots=SHOTS.map((s,i)=>`<figure><img alt="Ejemplo de landing" data-im="${i}" src=""><figcaption>${esc(s[0])}<small>${esc(s[1])}</small></figcaption></figure>`).join('');
+ return `<div class="pg p1"><div class="hd"><div class="br">${brand}</div><div class="tag">Propuesta personalizada</div></div>
  <div class="bd"><h1>Propuesta para ${esc(m.n)}</h1><p class="intro">${esc(m.intro)}</p>
- <div class="two"><div>${inc}</div><div><h4>Cómo trabajamos</h4><ol>${m.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div></div>
- <h4>Inversión</h4><table>${m.rows.map(r=>`<tr><td>${esc(r[0])}${r[1]?`<small>${esc(r[1])}</small>`:''}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>
+ ${incBlock}
+ <h4>Así se ve una landing</h4><div class="shots">${shots}</div>
+ <p class="nt">${aviso?esc(aviso):''}</p></div>${ft}</div>
+ <div class="pg p2"><div class="hd slim"><div class="br">${brand}</div><div class="tag">Propuesta para ${esc(m.n)}</div></div>
+ <div class="bd"><h4>Cómo trabajamos</h4><ol class="big">${m.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+ <h4>Inversión</h4><table class="big">${m.rows.map(r=>`<tr><td>${esc(r[0])}${r[1]?`<small>${esc(r[1])}</small>`:''}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>
  ${m.notes.length?`<p class="nt">${m.notes.map(esc).join(' ')}</p>`:''}
  ${aviso?`<div class="ex">${L.p?`<a href="${esc(L.p)}" style="color:inherit;font-weight:700">Mirá proyectos de ejemplo →</a><br>`:''}${esc(aviso)}</div>`:''}
- ${L.w?`<p class="cta"><a href="${esc(L.w)}">Escribime por WhatsApp</a></p>`:''}</div>
- <div class="ft"><span>${esc(S.tuNombre||'')}${S.marca?' · '+esc(S.marca):''}</span>${L.p?`<a href="${esc(L.p)}">${esc(L.pTxt)}</a>`:''}${L.w?`<a href="${esc(L.w)}">WhatsApp ${esc(L.wTxt)}</a>`:''}${L.ig?`<a href="${esc(L.ig)}">Instagram ${esc(L.igTxt)}</a>`:''}</div></div>`;
+ ${L.w?`<p class="cta"><a href="${esc(L.w)}">Escribime por WhatsApp</a></p>`:''}</div>${ft}</div>`;
 }
+const cleanSheet=h=>h.replace(/ src="data:[^"]*"/g,' src=""');
+function hydrate(root){const set=IMGS[S.rubro]||IMGS.otro;root.querySelectorAll('img[data-im]').forEach(im=>{im.src=set[+im.dataset.im]||''})}
 function sheetText(){
  const m=model(),L=links();let t=`PROPUESTA PARA ${m.n.toUpperCase()}\n\n${m.intro}\n`;
  m.inc.forEach(([h,l])=>{t+=`\n${h.toUpperCase()}\n`+l.map(x=>'• '+x).join('\n')+'\n'});
@@ -171,29 +181,32 @@ function ofertaPhrase(){
 }
 function dmText(){
  const c=S.contacto.trim(),n=S.negocio.trim();
- let t=`Hola${c?' '+c:''}! 👋 Soy ${S.tuNombre||'Dio'} de ${S.marca||'EstrategIA'}.\n\n`;
+ let t=`Hola${c?' '+c:''}! 👋 Soy ${S.tuNombre||'Dio Rodriguez'} de ${S.marca||'EstrategIA'}.\n\n`;
  t+=`Estuve viendo ${n?n:'tu negocio'} en Instagram${S.obs.trim()?' y '+S.obs.trim().replace(/[.!\s]+$/,''):' y me gustó mucho lo que hacen'}.\n\n`;
  t+=`Me dedico a crear ${ofertaPhrase()}.\n\n`;
  t+=S.demo?`Si te interesa, te armo una demo gratis con tus propias fotos y productos para que la veas antes de decidir. Si no te gusta, no pasa nada 🙂\n\n`:`Si te interesa, te cuento cómo funciona sin ningún compromiso 🙂\n\n`;
  if(S.portafolio)t+=`Podés ver mis proyectos acá: ${fixUrl(S.portafolio)}\n${(S.avisoEjemplo||'').trim()?'(Las landings de prueba son solo imágenes de representación y ejemplo.)\n':''}\n`;
- t+=`¿Te cuento cómo sería para ${n||'tu negocio'}?`;return t;
+ t+=`Te dejo una propuesta lista. Gracias, Saludos.`;return t;
 }
 const longText=()=>dmText()+'\n\n— — —\n\n'+sheetText();
 function fitSheet(){
- const sh=$('#sheet');if(!sh||!sh.firstElementChild)return;
- let fs=14.5;sh.style.fontSize=fs+'px';
- while(sh.scrollHeight>sh.clientHeight+1&&fs>7){fs-=.25;sh.style.fontSize=fs+'px'}
- $('#fitInfo').textContent=fs<12.5?'Texto largo: se achicó para entrar en una sola hoja.':'';
+ const sh=$('#sheet');if(!sh)return;let shrunk=false;
+ sh.querySelectorAll('.pg').forEach((pg,i)=>{
+  let fs=i===0?14.5:18;pg.style.fontSize=fs+'px';
+  while(pg.scrollHeight>pg.clientHeight+1&&fs>7){fs-=.25;pg.style.fontSize=fs+'px'}
+  if(fs<(i===0?12.5:15))shrunk=true;
+ });
+ $('#fitInfo').textContent=shrunk?'Texto largo: se achicó para que cada hoja entre en su página.':'';
 }
 function renderProp(k){
  const g=dmText();
  if(k!=='dm')$('#dm').value=(S.dmSaved&&S.dmGen===g)?S.dmSaved:g;
  const sh=$('#sheet');
- if(document.activeElement!==sh){const h=sheetHTML();sh.innerHTML=(S.sheetSaved&&S.sheetGen===h)?S.sheetSaved:h}
+ if(document.activeElement!==sh){const h=sheetHTML();sh.innerHTML=(S.sheetSaved&&S.sheetGen===h)?S.sheetSaved:h;hydrate(sh)}
  fitSheet();
 }
 $('#dm').addEventListener('input',()=>{S.dmSaved=$('#dm').value;S.dmGen=dmText();save()});
-$('#sheet').addEventListener('input',()=>{S.sheetSaved=$('#sheet').innerHTML;S.sheetGen=sheetHTML();save();fitSheet()});
+$('#sheet').addEventListener('input',()=>{S.sheetSaved=cleanSheet($('#sheet').innerHTML);S.sheetGen=sheetHTML();save();fitSheet()});
 $('#regen').onclick=()=>{S.dmSaved='';S.sheetSaved='';save();$('#sheet').blur();renderProp();$('#regen').textContent='¡Listo!';setTimeout(()=>$('#regen').textContent='Regenerar texto',1200)};
 
 /* ================================================================
@@ -272,7 +285,7 @@ $('#cpDM').onclick=e=>copy($('#dm').value,e.target);
 $('#cpTxt').onclick=e=>copy(sheetText(),e.target);
 let _title=document.title;
 function printSheet(){const h=$('#pdfHint');h.hidden=false;_title=document.title;document.title='Propuesta '+(S.negocio.trim()||'')+' - '+(S.marca||'EstrategIA');fitSheet();setTimeout(()=>window.print(),80)}
-function mkPrint(){fitSheet();let r=$('#printRoot');if(r)r.remove();r=document.createElement('div');r.id='printRoot';const c=$('#sheet').cloneNode(true);c.removeAttribute('contenteditable');c.removeAttribute('id');r.appendChild(c);document.body.appendChild(r)}
+function mkPrint(){fitSheet();let r=$('#printRoot');if(r)r.remove();r=document.createElement('div');r.id='printRoot';const c=$('#sheet').cloneNode(true);c.removeAttribute('contenteditable');c.removeAttribute('id');r.appendChild(c);hydrate(c);document.body.appendChild(r)}
 window.addEventListener('beforeprint',mkPrint);window.addEventListener('afterprint',()=>{document.title=_title;const r=$('#printRoot');if(r)r.remove()});
 $('#prt').onclick=printSheet;
 $('#longMsg').onclick=()=>{$('#longTxt').value=longText();$('#dlgLong').showModal()};
@@ -299,7 +312,7 @@ $$('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 function getCl(){try{return JSON.parse(lsGet(KCL)||'{}')}catch(e){return{}}}
 function setCl(o){if(!lsSet(KCL,JSON.stringify(o))){const c={};Object.keys(o).forEach(k=>c[k]=stripImg(o[k]));lsSet(KCL,JSON.stringify(c))}}
 function fillCl(){const o=getCl();$('#cl').innerHTML='<option value="">— clientes guardados —</option>'+Object.keys(o).sort().map(k=>`<option>${esc(k)}</option>`).join('')}
-$('#cSave').onclick=()=>{const k=(S.negocio||'').trim();if(!k){$('#cSave').textContent='Poné un nombre';setTimeout(()=>$('#cSave').textContent='Guardar',1300);return}S.dmSaved=$('#dm').value;S.dmGen=dmText();S.sheetSaved=$('#sheet').innerHTML;S.sheetGen=sheetHTML();save();const o=getCl();const prev=o[k];o[k]=clone(S);if(prev&&$('#cl').value!==k){['estado','fEnvio','fReescribir','nota'].forEach(f=>{if(prev[f]!==undefined)o[k][f]=prev[f]})}setCl(o);fillCl();$('#cl').value=k;segCount();$('#cSave').textContent='¡Guardado!';setTimeout(()=>$('#cSave').textContent='Guardar',1200)};
+$('#cSave').onclick=()=>{const k=(S.negocio||'').trim();if(!k){$('#cSave').textContent='Poné un nombre';setTimeout(()=>$('#cSave').textContent='Guardar',1300);return}S.dmSaved=$('#dm').value;S.dmGen=dmText();S.sheetSaved=cleanSheet($('#sheet').innerHTML);S.sheetGen=sheetHTML();save();const o=getCl();const prev=o[k];o[k]=clone(S);if(prev&&$('#cl').value!==k){['estado','fEnvio','fReescribir','nota'].forEach(f=>{if(prev[f]!==undefined)o[k][f]=prev[f]})}setCl(o);fillCl();$('#cl').value=k;segCount();$('#cSave').textContent='¡Guardado!';setTimeout(()=>$('#cSave').textContent='Guardar',1200)};
 $('#cl').onchange=e=>{const k=e.target.value;if(!k)return;const o=getCl();if(o[k]){S=Object.assign(clone(DEF),o[k]);fix();applyBrand();renderItems();sync();save();render()}};
 $('#cNew').onclick=()=>{const keep=['tuNombre','marca','miWa','miIg','portafolio','bDark','bMain','bAcc','avisoEjemplo','moneda','precioUSD','precioARS','appUSD','appARS','detallePago','items','notas','demo','panel','lang','cartel','creditos','oferta'];const n=clone(DEF);keep.forEach(k=>n[k]=clone(S[k]));S=n;$('#cl').value='';applyBrand();renderItems();sync();save();render()};
 $('#cDel').onclick=()=>{const k=$('#cl').value;if(!k)return;const o=getCl();delete o[k];setCl(o);fillCl()};

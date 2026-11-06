@@ -57,11 +57,21 @@ input:focus,select:focus,textarea:focus{outline:2px solid color-mix(in srgb,var(
 .it .sub{margin-top:8px}
 .it textarea{min-height:44px;margin-top:8px}
 .dim{opacity:.45}
-/* hoja de propuesta: una sola página A4 */
+/* hoja de propuesta: 2 páginas A4 */
 .sheetwrap{overflow:auto;margin-top:10px;border-radius:6px;padding-bottom:6px}
-.sheet{width:210mm;height:297mm;background:#fff;color:#141a33;font-size:13px;line-height:1.45;position:relative;overflow:hidden;box-shadow:0 20px 40px -26px rgba(10,14,39,.65);outline:none;margin:0 auto;font-family:'DM Sans',system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{width:210mm;color:#141a33;font-size:13px;line-height:1.45;position:relative;outline:none;margin:0 auto;font-family:'DM Sans',system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .sheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.sheet .pg{display:flex;flex-direction:column;height:100%}
+.sheet .pg{display:flex;flex-direction:column;height:297mm;overflow:hidden;background:#fff;box-shadow:0 20px 40px -26px rgba(10,14,39,.65);margin:0 0 16px;position:relative}
+.sheet .hd.slim{padding:1.1em 2.4em 1em;display:flex;justify-content:space-between;align-items:center;gap:1em}.sheet .hd.slim .br{font-size:1.5em}.sheet .hd.slim .tag{margin:0}
+.sheet ul.c2{columns:2;column-gap:1.8em}.sheet ul.c2 li{break-inside:avoid}
+.sheet .incg{display:grid;grid-template-columns:1fr 1fr;gap:1.8em}
+.sheet .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1em;margin-top:.4em}
+.sheet .shots figure{margin:0;text-align:center}
+.sheet .shots img{display:block;width:100%;height:auto;border-radius:1.1em;border:.35em solid var(--ink);box-shadow:0 .6em 1.2em -.6em rgba(10,14,39,.5);background:#EDF1F7}
+.sheet .shots figcaption{margin-top:.7em;font-weight:700;color:var(--ink);line-height:1.25}
+.sheet .shots figcaption small{display:block;font-weight:400;color:#5F6A85;font-size:.88em;margin-top:.2em}
+.sheet .p2 .bd{padding-top:1.2em}.sheet .p2 td{padding:.8em 0}
+.sheet .big{font-size:1.1em}
 .sheet .hd,.sheet .ft{flex:none}
 .sheet .hd{background:var(--ink);color:#fff;padding:1.7em 2.4em 1.5em;position:relative}
 .sheet .hd::after{content:"";position:absolute;left:0;right:0;bottom:0;height:.3em;background:linear-gradient(90deg,var(--acc),var(--acc2))}
@@ -121,7 +131,8 @@ dialog::backdrop{background:rgba(20,25,35,.55)}
  html,body{background:#fff!important;margin:0!important;padding:0!important}
  body>*:not(#printRoot){display:none!important}
  #printRoot{display:block!important}
- #printRoot .sheet{box-shadow:none!important;margin:0!important}
+ #printRoot .sheet .pg{box-shadow:none!important;margin:0!important;break-after:page;page-break-after:always}
+ #printRoot .sheet .pg:last-child{break-after:auto;page-break-after:auto}
 }
 #printRoot{display:none}
 </style>
@@ -237,14 +248,14 @@ dialog::backdrop{background:rgba(20,25,35,.55)}
       <button class="btn line" id="regen">Regenerar texto</button>
     </div>
     <h2 style="margin-top:26px">Propuesta completa</h2>
-    <p class="hint">Una sola hoja A4, lista para mandar. Hacé clic y corregí cualquier frase directamente en la hoja; si el texto crece, se achica solo para que entre.</p>
+    <p class="hint">Dos hojas A4: la 1 explica qué es una landing y la 2 tiene la inversión. Hacé clic y corregí cualquier frase directamente en la hoja; si el texto crece, se achica solo para que entre.</p>
     <div class="bar tools">
       <button class="btn alt" id="prt">Descargar PDF</button>
       <button class="btn line" id="cpTxt">Copiar como texto</button>
       <button class="btn line" id="toLand">Armar su landing →</button>
     </div>
     <p class="hint" id="fitInfo"></p>
-    <p class="hint" id="pdfHint" hidden>Se abre la ventana de impresión: en “Destino” elegí <b>Guardar como PDF</b>. El PDF sale en una sola hoja y los links (tu página, WhatsApp e Instagram) quedan clickeables.</p>
+    <p class="hint" id="pdfHint" hidden>Se abre la ventana de impresión: en “Destino” elegí <b>Guardar como PDF</b>. El PDF sale en 2 hojas y los links (tu página, WhatsApp e Instagram) quedan clickeables.</p>
     <div class="sheetwrap"><div class="sheet" id="sheet" contenteditable="true" spellcheck="true"></div></div>
   </div>
  </div>
