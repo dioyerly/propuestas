@@ -297,26 +297,29 @@ function mkPrint(){fitSheet();let r=$('#printRoot');if(r)r.remove();r=document.c
 window.addEventListener('beforeprint',mkPrint);window.addEventListener('afterprint',()=>{document.title=_title;const r=$('#printRoot');if(r)r.remove()});
 $('#prt').onclick=printSheet;
 function dlBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
-async function exportImgs(){
- const btn=$('#imgDl'),o=btn.textContent;btn.disabled=true;btn.textContent='Generando…';
+async function exportImgs(single,btn){
+ btn=btn||$('#imgDl');const o=btn.textContent;btn.disabled=true;btn.textContent='Generando…';
  try{
   if(document.fonts&&document.fonts.ready)await document.fonts.ready;
   fitSheet();
   const stage=document.createElement('div');stage.style.cssText='position:fixed;left:-12000px;top:0;width:210mm;pointer-events:none';document.body.appendChild(stage);
   const pgs=[...$('#sheet').querySelectorAll('.pg')];
+  const canv=[];
   for(let i=0;i<pgs.length;i++){
    const w=document.createElement('div');w.className='sheet';w.style.cssText='width:210mm;margin:0;font-family:\'DM Sans\',system-ui,sans-serif';
    const c=pgs[i].cloneNode(true);c.style.margin='0';c.style.boxShadow='none';w.appendChild(c);stage.appendChild(w);hydrate(w);
    const cv=await html2canvas(c,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false});
-   const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',.92));
-   dlBlob('Propuesta-'+(slug(S.negocio)||'cliente')+'-hoja'+(i+1)+'.jpg',blob);
-   w.remove();await new Promise(r=>setTimeout(r,500));
+   if(single)canv.push(cv);else{const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',.92));dlBlob('Propuesta-'+(slug(S.negocio)||'cliente')+'-hoja'+(i+1)+'.jpg',blob);await new Promise(r=>setTimeout(r,500))}
+   w.remove();
   }
+  if(single){const W=Math.max(...canv.map(c=>c.width)),H=canv.reduce((a,c)=>a+c.height,0);const big=document.createElement('canvas');big.width=W;big.height=H;const x=big.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);let y=0;canv.forEach(c=>{x.drawImage(c,0,y);y+=c.height});
+   const blob=await new Promise(r=>big.toBlob(r,'image/jpeg',.9));dlBlob('Propuesta-'+(slug(S.negocio)||'cliente')+'.jpg',blob)}
   stage.remove();btn.textContent='¡Listo!';
  }catch(e){btn.textContent='No se pudo, probá de nuevo';console.error(e)}
  setTimeout(()=>{btn.textContent=o;btn.disabled=false},1800);
 }
-$('#imgDl').onclick=exportImgs;
+$('#imgDl').onclick=()=>exportImgs(true);
+$('#imgDl2').onclick=()=>exportImgs(false,$('#imgDl2'));
 $('#longMsg').onclick=()=>{$('#longTxt').value=longText();$('#dlgLong').showModal()};
 $('#cpLong').onclick=e=>copy($('#longTxt').value,e.target);
 $('#longX').onclick=()=>$('#dlgLong').close();
