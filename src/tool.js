@@ -14,7 +14,7 @@ const DEF={
   {label:'Mantenimiento',mode:'gratis_luego',ars:'30000',usd:'',months:'3',text:'',detail:'Revisión mensual para ajustes. Pasados los meses gratis es opcional.'}
  ],
  notas:'El dominio se registra a tu nombre.\nSi más adelante no querés seguir con el mantenimiento, te quedás con los archivos de tu página y con tu dominio.',
- tuNombre:'Dio Rodriguez',marca:'EstrategIA',miWa:'+54 9 11 2642-5994',miIg:'@estrategia.datos',portafolio:'https://descargar.estrategia.site/#landings',bDark:'#0A0E27',bMain:'#00D9FF',bAcc:'#FF00FF',
+ tuNombre:'Dio Rodriguez',pLang:'es',marca:'EstrategIA',miWa:'+54 9 11 2642-5994',miIg:'@estrategia.datos',portafolio:'https://descargar.estrategia.site/#landings',bDark:'#0A0E27',bMain:'#00D9FF',bAcc:'#FF00FF',
  avisoEjemplo:'Las landings de prueba que ves en mi página son solo imágenes de representación y ejemplo. La tuya se arma con tu propio contenido, tus fotos y tus colores.',estado:'nuevo',fEnvio:'',fReescribir:'',nota:'',dmSaved:'',dmGen:'',sheetSaved:'',sheetGen:'',
  desc:'',slogan:'',sloganEn:'',about:'',aboutEn:'',prods:'',difs:'',wa:'',direccion:'',ciudad:'',horarios:'',
  diseno:'otro-1',color:'',lang:'es',modo:'landing',cartel:true,creditos:true,heroImg:'',gal:[],auto:{}
@@ -40,7 +40,14 @@ function completarRubro(replace){AUTOF.forEach(k=>{if(replace||!String(S[k]).tri
 /* ================================================================
    BINDING
 ================================================================ */
+function applyLangDefaults(){
+ const all=f=>Object.keys(PL).map(l=>f(PL[l])),p=PP();
+ if(all(x=>x.def.notas).includes(S.notas))S.notas=p.def.notas;
+ if(all(x=>x.def.aviso).includes(S.avisoEjemplo))S.avisoEjemplo=p.def.aviso;
+ S.items.forEach(it=>{[['i0'],['i1']].forEach(([k])=>{if(all(x=>x.def[k][0]).includes(it.label)){it.label=p.def[k][0];if(all(x=>x.def[k][1]).includes(it.detail))it.detail=p.def[k][1]}})});
+}
 function afterChange(k){
+ if(k==='pLang'){applyLangDefaults();renderItems()}
  if(AUTOF.includes(k))S.auto[k]=false;
  if(k==='rubro'){S.diseno=S.rubro+'-1';refreshAuto();sync()}
  if(k==='negocio'){refreshAuto();sync()}
@@ -84,13 +91,14 @@ const NEWITEM={
  texto:{label:'Concepto',mode:'texto',ars:'',usd:'',months:'',text:'',detail:''}
 };
 function money(a,u){const m=S.moneda,A=num(a),U=num(u),pa=A?ars(A):'',pu=U?usd(U):'';if(m==='usd')return pu||pa;if(m==='ars')return pa||pu;return[pu,pa].filter(Boolean).join(' · ')}
+const PP=()=>PL[S.pLang]||PL.es;
 function itemAmount(it){
- const mm=n=>n==1?'mes':'meses';
+ const p=PP(),mm=n=>n==1?p.mo[0]:p.mo[1];
  switch(it.mode){
-  case'gratis':return it.months?`Gratis ${it.months} ${mm(+it.months)}`:'Gratis';
-  case'unico':return money(it.ars,it.usd)||'A convenir';
-  case'mensual':return(money(it.ars,it.usd)||'A convenir')+' / mes';
-  case'gratis_luego':{const g=`Gratis ${it.months||3} ${mm(+(it.months||3))}`;const m=money(it.ars,it.usd);return m?`${g}, luego ${m} / mes`:g}
+  case'gratis':return it.months?p.freeN(it.months,mm(+it.months)):p.free;
+  case'unico':return money(it.ars,it.usd)||p.tbd;
+  case'mensual':return(money(it.ars,it.usd)||p.tbd)+' '+p.perMo;
+  case'gratis_luego':{const n=it.months||3,g=p.freeN(n,mm(+n));const m=money(it.ars,it.usd);return m?p.then(g,m):g}
   default:return it.text||''}
 }
 function renderItems(){
@@ -114,27 +122,25 @@ $$('[data-add]').forEach(b=>b.addEventListener('click',()=>{S.items.push(clone(N
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1).replace(/[.!\s]+$/,'');
 const lines=s=>String(s||'').split('\n').map(x=>x.trim()).filter(Boolean);
 function model(){
- const n=S.negocio.trim()||'tu negocio',o=S.oferta;
- const incL=['Diseño a medida, adaptado a los colores y al estilo de '+n,'Secciones claras: quiénes son, productos o servicios, horarios y ubicación','Botón directo a su WhatsApp y a su Instagram','Mapa con la dirección para que lleguen fácil','Se ve bien en celular, tablet y computadora'];
- const incA=['Catálogo online con productos, precios y fotos','Tus clientes eligen, arman el pedido y te llega listo por WhatsApp','Sin comisiones por venta ni intermediarios','Funciona desde el celular, sin instalar nada'];
- if(S.panel){incL.push('Panel de administración: cambiás tus productos y precios vos mismo');incA.push('Panel de administración para actualizar productos y precios cuando quieras')}
+ const p=PP(),n=S.negocio.trim()||({es:'tu negocio',en:'your business',pt:'o seu negócio',it:'la tua attività'}[S.pLang]||'tu negocio'),o=S.oferta;
+ const incL=p.incL(n),incA=p.incA.slice();
+ if(S.panel){incL.push(p.panL);incA.push(p.panA)}
  const custom=lines(S.incluye);
- const inc=custom.length?[['Qué incluye',custom]]:o==='landing'?[['Qué incluye',incL]]:o==='app'?[['Qué incluye',incA]]:[['Opción A · Landing page',incL],['Opción B · Micro app de pedidos',incA]];
- const opt=o==='landing'?'una landing page':o==='app'?'una micro app de pedidos':'una landing page o una micro app de pedidos';
- const intro='Hola'+(S.contacto?' '+S.contacto.trim():'')+'. Te comparto cómo podría ser '+opt+' para '+n+(S.obs.trim()?'. '+cap(S.obs.trim())+'.':'.')+' La idea es simple: que quien te encuentre en Instagram pueda ver lo que ofrecés y escribirte en un solo toque.';
+ const inc=custom.length?[[p.incT,custom]]:o==='landing'?[[p.incT,incL]]:o==='app'?[[p.incT,incA]]:[[p.optA,incL],[p.optB,incA]];
+ const opt=p.opt[o==='landing'?'landing':o==='app'?'app':'both'];
+ const intro=p.hi+(S.contacto?' '+S.contacto.trim():'')+'. '+p.share(opt,n)+(S.obs.trim()?'. '+cap(S.obs.trim())+'.':'.')+p.idea;
  let steps=lines(S.pasos);
  if(!steps.length){
-  steps=[S.demo?'Demo gratis: con tus fotos o productos te armo una página de muestra para que la veas. Si no te gusta, no pasa nada.':'Charla corta para conocer tu negocio y lo que necesitás.','Ajustes: cambiamos lo que haga falta hasta que quede como lo imaginás.','Pago único y publicación en tu propio dominio.'];
+  steps=[S.demo?p.stDemo:p.stTalk,p.stAdj,p.stPay];
   const fr=S.items.find(it=>(it.mode==='gratis_luego'||it.mode==='gratis')&&num(it.months));
-  if(fr)steps.push(`Acompañamiento: ${num(fr.months)} ${num(fr.months)==1?'mes':'meses'} de ${fr.label.toLowerCase()} gratis.`);
+  if(fr)steps.push(p.stSup(num(fr.months),num(fr.months)==1?p.mo[0]:p.mo[1],fr.label.toLowerCase()));
  }
  const rows=[];
  const base=S.detallePago.trim();
- if(o!=='app')rows.push(['Landing page',base||'Pago único, incluye diseño y publicación',money(S.precioARS,S.precioUSD)||'A convenir']);
- if(o!=='landing')rows.push(['Micro app de pedidos',base||'Pago único, incluye catálogo y pedidos por WhatsApp',money(S.appARS,S.appUSD)||'A convenir según tu negocio']);
+ if(o!=='app')rows.push([p.rL,base||p.rLd,money(S.precioARS,S.precioUSD)||p.tbd]);
+ if(o!=='landing')rows.push([p.rA,base||p.rAd,money(S.appARS,S.appUSD)||p.tbdA]);
  S.items.forEach(it=>{const am=itemAmount(it);if(!it.label.trim()&&!am)return;rows.push([it.label||'—',it.detail||'',am])});
- const contact=[];if(S.miWa)contact.push('WhatsApp: '+S.miWa);if(S.miIg)contact.push('Instagram: '+S.miIg);if(S.portafolio)contact.push('Portafolio: '+S.portafolio);
- return{n,intro,inc,steps,rows,notes:lines(S.notas),contact};
+ return{n,intro,inc,steps,rows,notes:lines(S.notas)};
 }
 const fixUrl=u=>{u=String(u||'').trim();return u?(/^https?:\/\//i.test(u)?u:'https://'+u):''};
 const showUrl=u=>fixUrl(u).replace(/^https?:\/\/(www\.)?/i,'').replace(/\/$/,'');
@@ -142,11 +148,6 @@ function links(){
  const w=waNum(S.miWa),ig=igUser(S.miIg),p=fixUrl(S.portafolio);
  return{p,pTxt:showUrl(p),w:w?'https://wa.me/'+w:'',wTxt:S.miWa||'',ig:ig?'https://instagram.com/'+ig:'',igTxt:ig?'@'+ig:''};
 }
-const SH={
- l:[['L0','Botón directo a tu WhatsApp','Quien te ve te escribe en un toque'],['L1','Tus productos con foto y precio','Todo tu catálogo ordenado y a la vista'],['L2','Horarios, mapa e info importante','Dirección, horarios y cómo llegar']],
- a:[['A0','Catálogo para elegir','Productos con foto, precio y botón “Agregar”'],['A2','Tu cliente arma su pedido','El carrito suma solo y muestra el total'],['A1','Pedido listo por WhatsApp','Te llega con todo el detalle, sin comisiones']],
- b:[['L0','Landing: botón directo a tu WhatsApp','Quien te ve te escribe en un toque'],['A0','Micro app: catálogo para elegir','Productos con foto, precio y botón “Agregar”'],['A1','Micro app: pedido listo por WhatsApp','Te llega con todo el detalle, sin comisiones']]
-};
 function sheetHTML(){
  const m=model(),L=links();
  const half=Math.ceil(m.inc[0][1].length/2);
@@ -155,46 +156,43 @@ function sheetHTML(){
  const aviso=(S.avisoEjemplo||'').trim();
  const brand=esc(S.marca||'Mi marca').replace(/(IA)$/,'<i>$1</i>');
  const ft=`<div class="ft"><span>${esc(S.tuNombre||'')}${S.marca?' · '+esc(S.marca):''}</span>${L.p?`<a href="${esc(L.p)}">${esc(L.pTxt)}</a>`:''}${L.w?`<a href="${esc(L.w)}">WhatsApp ${esc(L.wTxt)}</a>`:''}${L.ig?`<a href="${esc(L.ig)}">Instagram ${esc(L.igTxt)}</a>`:''}</div>`;
- const kind=S.oferta==='app'?'a':S.oferta==='landing'?'l':'b';
- const shotTitle=kind==='a'?'Así se ve una micro app de pedidos':kind==='l'?'Así se ve una landing':'Así se ven las dos opciones';
- const shots=SH[kind].map(s=>`<figure><img alt="Ejemplo" data-im="${s[0]}" src=""><figcaption>${esc(s[1])}<small>${esc(s[2])}</small></figcaption></figure>`).join('');
- return `<div class="pg p1"><div class="hd"><div class="br">${brand}</div><div class="tag">Propuesta personalizada</div></div>
- <div class="bd"><h1>Propuesta para ${esc(m.n)}</h1><p class="intro">${esc(m.intro)}</p>
+ const p=PP(),kind=S.oferta==='app'?'a':S.oferta==='landing'?'l':'b';
+ const shotTitle=p.shotT[kind];
+ const SHK=[['L0','A0','A1'],['L0','L1','L2'],['A0','A2','A1']];const keys=kind==='a'?['A0','A2','A1']:kind==='l'?['L0','L1','L2']:['L0','A0','A1'];
+ const shots=p.sh[kind].map((c,i)=>[keys[i],c[0],c[1]]).map(s=>`<figure><img alt="Ejemplo" data-im="${s[0]}" src=""><figcaption>${esc(s[1])}<small>${esc(s[2])}</small></figcaption></figure>`).join('');
+ return `<div class="pg p1"><div class="hd"><div class="br">${brand}</div><div class="tag">${esc(p.tag)}</div></div>
+ <div class="bd"><h1>${esc(p.title(m.n))}</h1><p class="intro">${esc(m.intro)}</p>
  ${incBlock}
  <h4>${shotTitle}</h4><div class="shots">${shots}</div>
  <p class="nt">${aviso?esc(aviso):''}</p></div>${ft}</div>
- <div class="pg p2"><div class="hd slim"><div class="br">${brand}</div><div class="tag">Propuesta para ${esc(m.n)}</div></div>
- <div class="bd"><h4>Cómo trabajamos</h4><ol class="big">${m.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
- <h4>Inversión</h4><table class="big">${m.rows.map(r=>`<tr><td>${esc(r[0])}${r[1]?`<small>${esc(r[1])}</small>`:''}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>
+ <div class="pg p2"><div class="hd slim"><div class="br">${brand}</div><div class="tag">${esc(p.title(m.n))}</div></div>
+ <div class="bd"><h4>${esc(p.how)}</h4><ol class="big">${m.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+ <h4>${esc(p.inv)}</h4><table class="big">${m.rows.map(r=>`<tr><td>${esc(r[0])}${r[1]?`<small>${esc(r[1])}</small>`:''}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>
  ${m.notes.length?`<p class="nt">${m.notes.map(esc).join(' ')}</p>`:''}
- ${aviso?`<div class="ex">${L.p?`<a href="${esc(L.p)}" style="color:inherit;font-weight:700">Mirá proyectos de ejemplo →</a><br>`:''}${esc(aviso)}</div>`:''}
- ${L.w?`<p class="cta"><a href="${esc(L.w)}">Escribime por WhatsApp</a></p>`:''}</div>${ft}</div>`;
+ ${aviso?`<div class="ex">${L.p?`<a href="${esc(L.p)}" style="color:inherit;font-weight:700">${esc(p.proj)}</a><br>`:''}${esc(aviso)}</div>`:''}
+ ${L.w?`<p class="cta"><a href="${esc(L.w)}">${esc(p.cta)}</a></p>`:''}</div>${ft}</div>`;
 }
 const cleanSheet=h=>h.replace(/ src="data:[^"]*"/g,' src=""');
 function hydrate(root){const r=S.rubro;root.querySelectorAll('img[data-im]').forEach(im=>{const k=im.dataset.im,set=k[0]==='A'?(IMGS_APP[r]||IMGS_APP.otro):(IMGS[r]||IMGS.otro);im.src=set[+k.slice(1)]||''})}
 function sheetText(){
- const m=model(),L=links();let t=`PROPUESTA PARA ${m.n.toUpperCase()}\n\n${m.intro}\n`;
+ const m=model(),L=links(),p=PP();let t=`${p.h.prop} ${m.n.toUpperCase()}\n\n${m.intro}\n`;
  m.inc.forEach(([h,l])=>{t+=`\n${h.toUpperCase()}\n`+l.map(x=>'• '+x).join('\n')+'\n'});
- t+='\nCÓMO TRABAJAMOS\n'+m.steps.map((x,i)=>(i+1)+'. '+x).join('\n')+'\n';
- t+='\nINVERSIÓN\n'+m.rows.map(r=>`• ${r[0]}: ${r[2]}${r[1]?' ('+r[1]+')':''}`).join('\n')+'\n';
+ t+=`\n${p.h.how}\n`+m.steps.map((x,i)=>(i+1)+'. '+x).join('\n')+'\n';
+ t+=`\n${p.h.inv}\n`+m.rows.map(r=>`• ${r[0]}: ${r[2]}${r[1]?' ('+r[1]+')':''}`).join('\n')+'\n';
  if(m.notes.length)t+='\n'+m.notes.join(' ')+'\n';
  if((S.avisoEjemplo||'').trim())t+='\n'+S.avisoEjemplo.trim()+'\n';
  t+=`\n${S.tuNombre||''}${S.marca?' · '+S.marca:''}\n`;
- if(L.p)t+='Proyectos: '+L.p+'\n';if(L.w)t+='WhatsApp: '+L.w+'\n';if(L.ig)t+='Instagram: '+L.ig;return t.trim();
-}
-function ofertaPhrase(){
- return S.oferta==='landing'?'páginas web a medida (landing pages): tus productos, horarios, ubicación y un botón directo a tu WhatsApp'
-  :S.oferta==='app'?'micro apps de pedidos: un catálogo online donde tus clientes arman el pedido y te llega listo por WhatsApp'
-  :'dos cosas para negocios como el tuyo: una página web a medida (con tus productos, horarios y botón a tu WhatsApp) o una micro app de pedidos (tus clientes arman el pedido y te llega listo por WhatsApp)';
+ if(L.p)t+=p.projL+': '+L.p+'\n';if(L.w)t+='WhatsApp: '+L.w+'\n';if(L.ig)t+='Instagram: '+L.ig;return t.trim();
 }
 function dmText(){
- const c=S.contacto.trim(),n=S.negocio.trim();
- let t=`Hola${c?' '+c:''}! 👋 Soy ${S.tuNombre||'Dio Rodriguez'} de ${S.marca||'EstrategIA'}.\n\n`;
- t+=`Estuve viendo ${n?n:'tu negocio'} en Instagram${S.obs.trim()?' y '+S.obs.trim().replace(/[.!\s]+$/,''):' y me gustó mucho lo que hacen'}.\n\n`;
- t+=`Me dedico a crear ${ofertaPhrase()}.\n\n`;
- t+=S.demo?`Si te interesa, te armo una demo gratis con tus propias fotos y productos para que la veas antes de decidir. Si no te gusta, no pasa nada 🙂\n\n`:`Si te interesa, te cuento cómo funciona sin ningún compromiso 🙂\n\n`;
- if(S.portafolio)t+=`Podés ver mis proyectos acá: ${fixUrl(S.portafolio)}\n${(S.avisoEjemplo||'').trim()?'(Las landings de prueba son solo imágenes de representación y ejemplo.)\n':''}\n`;
- t+=`Te dejo una propuesta lista. Gracias, Saludos.`;return t;
+ const p=PP().dm,c=S.contacto.trim(),n=S.negocio.trim();
+ const ph=p.ph[S.oferta==='landing'?'landing':S.oferta==='app'?'app':'both'];
+ let t=p.greet(c,S.tuNombre||'Dio Rodriguez',S.marca||'EstrategIA')+'\n\n';
+ t+=p.saw(n,S.obs.trim().replace(/[.!\s]+$/,''))+'\n\n';
+ t+=p.does+ph+'.\n\n';
+ t+=(S.demo?p.demo:p.nodemo)+'\n\n';
+ if(S.portafolio)t+=`${p.proj} ${fixUrl(S.portafolio)}\n${(S.avisoEjemplo||'').trim()?p.note+'\n':''}\n`;
+ t+=p.end;return t;
 }
 const longText=()=>dmText()+'\n\n— — —\n\n'+sheetText();
 function fitSheet(){
