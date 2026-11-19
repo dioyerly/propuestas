@@ -83,11 +83,29 @@ function viewRecover(){
  box.innerHTML=`<h1>Recuperar contraseña</h1><p class="lh">Ingresá tu mail y el código de recuperación que guardaste.</p>
  ${fld('lEmail','Mail','email',a.email)}${fld('lC','Código de recuperación','text','','XXXX-XXXX-XXXX-XXXX')}${fld('lP1','Contraseña nueva (mínimo 6)','password')}${fld('lP2','Repetí la contraseña','password')}
  <button class="lb" id="lGo">Cambiar contraseña</button><button class="ll" id="lBack">Volver</button>
- <p class="lh small">¿No tenés el código? Se puede reiniciar borrando los datos del sitio en el navegador, pero se pierden los clientes guardados.</p><p class="lm" id="lockMsg"></p>`;
- $a('#lBack').onclick=viewLogin;
+ <button class="ll" id="lNoCode">No tengo el código</button><p class="lm" id="lockMsg"></p>`;
+ $a('#lBack').onclick=viewLogin;$a('#lNoCode').onclick=viewReset;
  $a('#lGo').onclick=()=>{
   const em=$a('#lEmail').value.trim().toLowerCase(),c=normCode($a('#lC').value),p1=$a('#lP1').value,p2=$a('#lP2').value;
   if(em!==a.email||hash(c,a.rs)!==a.rh)return msg('El mail o el código no coinciden.');
+  if(p1.length<6)return msg('La contraseña tiene que tener al menos 6 caracteres.');
+  if(p1!==p2)return msg('Las contraseñas no coinciden.');
+  const code=newCode(),salt=hex(12),rs=hex(12);
+  const n={v:1,email:a.email,salt,ph:hash(p1,salt),rs,rh:hash(normCode(code),rs)};
+  if(!put(n))return msg('No pude guardar. Probá de nuevo.');
+  setSession(n,false);viewCode(code,n);
+ };
+}
+/* sin código: con el mail guardado se crea una contraseña nueva y se conservan los clientes */
+function viewReset(){
+ const a=get();
+ box.innerHTML=`<h1>Contraseña nueva</h1><p class="lh">Si no tenés el código, confirmá el mail y creá una contraseña nueva. Tus clientes guardados se conservan y vas a recibir un código nuevo.</p>
+ ${fld('lEmail','Mail','email',a.email)}${fld('lP1','Contraseña nueva (mínimo 6)','password')}${fld('lP2','Repetí la contraseña','password')}
+ <button class="lb" id="lGo">Crear contraseña nueva</button><button class="ll" id="lBack">Volver</button><p class="lm" id="lockMsg"></p>`;
+ $a('#lBack').onclick=viewRecover;
+ $a('#lGo').onclick=()=>{
+  const em=$a('#lEmail').value.trim().toLowerCase(),p1=$a('#lP1').value,p2=$a('#lP2').value;
+  if(em!==a.email)return msg('Ese mail no es el que se usó al crear la contraseña ('+a.email.replace(/^(.{2}).*(@.*)$/,'$1***$2')+').');
   if(p1.length<6)return msg('La contraseña tiene que tener al menos 6 caracteres.');
   if(p1!==p2)return msg('Las contraseñas no coinciden.');
   const code=newCode(),salt=hex(12),rs=hex(12);
